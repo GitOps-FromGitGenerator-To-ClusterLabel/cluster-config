@@ -57,23 +57,37 @@ spec:
       syncPolicy: {}
       revisionHistoryLimit: 5
 
+# # PreProduction environment, using Git as generator, main branch
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: preproduction-openshift-monitoring
+#   namespace: openshift-gitops
+# spec:
+#   generators:
+#   - git:
+#       repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
+#       revision: main
+#       files:
+#       - path: "cluster-definition/**/cluster.json"
+#   syncPolicy:
+#     preserveResourcesOnDeletion: true
+#   template:
+#     metadata:
+#       name: '{{cluster.name}}-openshift-monitoring'
+#     spec:
+#       project: preproduction-cluster-config
+#       source:
+#         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+#         targetRevision: main
+#         path: openshift-monitoring/overlays/{{cluster.name}}
+#       destination:
+#         server: '{{cluster.address}}'
+#       syncPolicy: {}
+#       revisionHistoryLimit: 5
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# PreProduction environment, using Git as generator, main branch
+# PreProduction environment, using Cluster Selector as Generator, development branch
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -82,30 +96,57 @@ metadata:
   namespace: openshift-gitops
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
-      revision: main
-      files:
-      - path: "cluster-definition/**/cluster.json"
+  - clusters:
+      selector:
+        matchLabels:
+          environment: preproduction
   syncPolicy:
     preserveResourcesOnDeletion: true
   template:
     metadata:
-      name: '{{cluster.name}}-openshift-monitoring'
+      name: '{{name}}-openshift-monitoring'
     spec:
       project: preproduction-cluster-config
       source:
         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
         targetRevision: main
-        path: openshift-monitoring/overlays/{{cluster.name}}
+        path: openshift-monitoring/overlays/{{name}}
       destination:
-        server: '{{cluster.address}}'
+        server: '{{server}}'
       syncPolicy: {}
       revisionHistoryLimit: 5
 
+# # Production environment, using Git as generator, main branch
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: production-openshift-monitoring
+#   namespace: openshift-gitops
+# spec:
+#   generators:
+#   - git:
+#       repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
+#       revision: main
+#       files:
+#       - path: "cluster-definition/**/cluster.json"
+#   syncPolicy:
+#     preserveResourcesOnDeletion: true
+#   template:
+#     metadata:
+#       name: '{{cluster.name}}-openshift-monitoring'
+#     spec:
+#       project: production-cluster-config
+#       source:
+#         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+#         targetRevision: main
+#         path: openshift-monitoring/overlays/{{cluster.name}}
+#       destination:
+#         server: '{{cluster.address}}'
+#       syncPolicy: {}
+#       revisionHistoryLimit: 5
 
-# Production environment, using Git as generator, main branch
----
+# Production environment, using Cluster Selector as Generator, development branch
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -113,11 +154,10 @@ metadata:
   namespace: openshift-gitops
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
-      revision: main
-      files:
-      - path: "cluster-definition/**/cluster.json"
+  - clusters:
+      selector:
+        matchLabels:
+          environment: production
   syncPolicy:
     preserveResourcesOnDeletion: true
   template:
