@@ -162,14 +162,14 @@ spec:
     preserveResourcesOnDeletion: true
   template:
     metadata:
-      name: '{{cluster.name}}-openshift-monitoring'
+      name: '{{name}}-openshift-monitoring'
     spec:
       project: production-cluster-config
       source:
         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
         targetRevision: main
-        path: openshift-monitoring/overlays/{{cluster.name}}
+        path: openshift-monitoring/overlays/{{name}}
       destination:
-        server: '{{cluster.address}}'
+        server: '{{server}}'
       syncPolicy: {}
       revisionHistoryLimit: 5
