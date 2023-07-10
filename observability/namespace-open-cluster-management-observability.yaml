@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    network.openshift.io/policy-group: open-cluster-management-observability
+  name: open-cluster-management-observability
+
