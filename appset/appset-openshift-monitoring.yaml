@@ -1,0 +1,31 @@
+# Development environment, using Git as generator, development branch
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: development-openshift-monitoring
+  namespace: openshift-gitops
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
+      revision: main
+      files:
+      - path: "cluster-definition/**/cluster.json"
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: '{{cluster.name}}-openshift-monitoring'
+    spec:
+      project: development-cluster-config
+      source:
+        repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+        targetRevision: development
+        path: openshift-monitoring/overlays/{{cluster.name}}
+      destination:
+        server: '{{cluster.address}}'
+      syncPolicy: {}
+      revisionHistoryLimit: 5
+
+
