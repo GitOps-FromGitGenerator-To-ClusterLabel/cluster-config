@@ -37,7 +37,7 @@ spec:
 #   - clusters:
 #       selector:
 #         matchLabels:
-#           environment: production
+#           environment: acm-production
 #           usage: acm-hub
 #   template:
 #     metadata:
