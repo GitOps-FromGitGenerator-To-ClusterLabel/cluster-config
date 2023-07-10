@@ -11,7 +11,7 @@ spec:
       repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/bootstrap.git
       revision: main
       files:
-      - path: "cluster-definition/in-cluster/cluster.json"
+      - path: "cluster-definition/local-cluster/cluster.json"
   template:
     metadata:
       name: '{{cluster.name}}-open-cluster-management-observability'
@@ -25,4 +25,29 @@ spec:
         server: '{{cluster.address}}'
       syncPolicy: {}
 
-# Moving to Cluster Selector as Generator
+# # Moving to Cluster Selector as Generator
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: open-cluster-management-observability
+#   namespace: openshift-gitops
+# spec:
+#   generators:
+#   - clusters:
+#       selector:
+#         matchLabels:
+#           environment: production
+#           usage: acm-hub
+#   template:
+#     metadata:
+#       name: '{{name}}-open-cluster-management-observability'
+#     spec:
+#       project: observability
+#       source:
+#         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+#         targetRevision: main
+#         path: observability
+#       destination:
+#         server: '{{server}}'
+#       syncPolicy: {}
