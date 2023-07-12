@@ -1,0 +1,85 @@
+# All Clusters
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: openshift-apiserver
+  namespace: openshift-gitops
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          environment: development
+      values:
+        branch: development
+        project: development-cluster-config
+  - clusters:
+      selector:
+        matchLabels:
+          environment: preproduction
+      values:
+        branch: main
+        project: preproduction-cluster-config
+  - clusters:
+      selector:
+        matchLabels:
+          environment: production
+      values:
+        branch: main
+        project: production-cluster-config
+  - clusters:
+      selector:
+        matchLabels:
+          sox: "true"
+      values:
+        branch: main
+        project: default
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: '{{name}}-apiserver'
+    spec:
+      project: '{{values.project}}'
+      source:
+        repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+        targetRevision: '{{values.branch}}'
+        path: apiserver/overlays/{{name}}
+      destination:
+        server: '{{server}}'
+      syncPolicy: {}
+      revisionHistoryLimit: 5
+# SOX Clusters
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: openshift-sox-apiserver
+  namespace: openshift-gitops
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          sox: "true"
+      values:
+        branch: main
+        project: default
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: '{{name}}-sox-apiserver'
+    spec:
+      project: '{{values.project}}'
+      source:
+        repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
+        targetRevision: '{{values.branch}}'
+        path: apiserver/overlays/sox
+      destination:
+        server: '{{server}}'
+      syncPolicy: {}
+      revisionHistoryLimit: 5
+
+
