@@ -14,27 +14,34 @@ spec:
       values:
         branch: development
         project: development-cluster-config
+        path: '{{name}}'
   - clusters:
       selector:
         matchLabels:
           environment: preproduction
+          sox: "false"
       values:
         branch: main
         project: preproduction-cluster-config
+        path: '{{name}}'
   - clusters:
       selector:
         matchLabels:
           environment: production
+        matchExpressions:
+          - { key: sox, operator: NotIn, values: ["true"] }
       values:
         branch: main
         project: production-cluster-config
+        path: '{{name}}'
   - clusters:
       selector:
-        matchLabels:
-          sox: "true"
+        matchExpressions:
+          - { key: sox, operator: In, values: ["true"] }
       values:
         branch: main
         project: default
+        path: sox
   syncPolicy:
     preserveResourcesOnDeletion: true
   template:
@@ -45,41 +52,8 @@ spec:
       source:
         repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
         targetRevision: '{{values.branch}}'
-        path: apiserver/overlays/{{name}}
+        path: apiserver/overlays/{{values.path}}
       destination:
         server: '{{server}}'
       syncPolicy: {}
       revisionHistoryLimit: 5
-# SOX Clusters
----
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: openshift-sox-apiserver
-  namespace: openshift-gitops
-spec:
-  generators:
-  - clusters:
-      selector:
-        matchLabels:
-          sox: "true"
-      values:
-        branch: main
-        project: default
-  syncPolicy:
-    preserveResourcesOnDeletion: true
-  template:
-    metadata:
-      name: '{{name}}-sox-apiserver'
-    spec:
-      project: '{{values.project}}'
-      source:
-        repoURL: https://github.com/GitOps-FromGitGenerator-To-ClusterLabel/cluster-config.git
-        targetRevision: '{{values.branch}}'
-        path: apiserver/overlays/sox
-      destination:
-        server: '{{server}}'
-      syncPolicy: {}
-      revisionHistoryLimit: 5
-
-
